@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -6,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import DateRangePicker from './DateRangePicker';
 import { ArrowRightLeft } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { DateRange } from 'react-day-picker'; // Import DateRange from react-day-picker
 
 // Mock data for zones and stations
 const zones = [
@@ -44,10 +44,7 @@ interface SearchFormProps {
   onSearch: (criteria: any) => void;
 }
 
-interface DateRange {
-  from: Date | undefined;
-  to: Date | undefined;
-}
+// Removed the custom DateRange interface as we're using the one from react-day-picker
 
 const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   const [departureRange, setDepartureRange] = useState<DateRange>({ from: undefined, to: undefined });

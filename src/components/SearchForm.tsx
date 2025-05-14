@@ -7,6 +7,7 @@ import DateRangePicker from './DateRangePicker';
 import { ArrowRightLeft } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DateRange } from 'react-day-picker'; // Import DateRange from react-day-picker
+import { Checkbox } from '@/components/ui/checkbox';
 
 // Updated zones data from user provided information
 const zones = [
@@ -114,7 +115,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   const [departureRange, setDepartureRange] = useState<DateRange>({ from: undefined, to: undefined });
   const [returnRange, setReturnRange] = useState<DateRange>({ from: undefined, to: undefined });
   const [departureZone, setDepartureZone] = useState<string>('');
-  const [departureStation, setDepartureStation] = useState<string>('');
+  const [selectedDepartureStations, setSelectedDepartureStations] = useState<string[]>([]);
   const [arrivalZone, setArrivalZone] = useState<string>('');
   const [arrivalStation, setArrivalStation] = useState<string>('');
 
@@ -125,8 +126,8 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
     setArrivalZone(tempZone);
 
     // Swap departure and arrival stations
-    const tempStation = departureStation;
-    setDepartureStation(arrivalStation);
+    const tempStation = selectedDepartureStations.length > 0 ? selectedDepartureStations[0] : '';
+    setSelectedDepartureStations(arrivalStation ? [arrivalStation] : []);
     setArrivalStation(tempStation);
   };
 
@@ -136,16 +137,26 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
       departureRange,
       returnRange,
       departureZone,
-      departureStation,
+      departureStations: selectedDepartureStations,
       arrivalZone,
       arrivalStation,
     });
   };
 
+  const toggleDepartureStation = (stationId: string) => {
+    setSelectedDepartureStations(prev => {
+      if (prev.includes(stationId)) {
+        return prev.filter(id => id !== stationId);
+      } else {
+        return [...prev, stationId];
+      }
+    });
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto mb-8">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-[#002B5C]">Recherche de trajets TGV Max</h2>
+    <div className="bg-white rounded-xl shadow-lg p-6 max-w-3xl mx-auto mb-8 border border-[#E0E7FF]">
+      <div className="bg-gradient-to-r from-[#002B5C] to-[#00B2E3] -mx-6 -mt-6 px-6 py-4 rounded-t-xl mb-6 flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-white">Recherche de trajets TGV Max</h2>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -154,11 +165,12 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
                 size="icon" 
                 onClick={handleInvertCriteria}
                 aria-label="Inverser aller/retour"
+                className="text-white hover:bg-white/20"
               >
-                <ArrowRightLeft className="h-5 w-5 text-[#002B5C]" />
+                <ArrowRightLeft className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-[#002B5C] text-white border-none shadow-lg">
               <p>Inverser aller/retour</p>
             </TooltipContent>
           </Tooltip>
@@ -167,8 +179,8 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid gap-6 lg:grid-cols-2">
-          <div>
-            <Label htmlFor="departure-dates" className="block mb-2 text-sm font-medium">
+          <div className="bg-[#F6F6F6] p-4 rounded-lg shadow-sm">
+            <Label htmlFor="departure-dates" className="block mb-2 text-sm font-medium text-[#002B5C]">
               Dates aller
             </Label>
             <DateRangePicker 
@@ -179,8 +191,8 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             />
           </div>
 
-          <div>
-            <Label htmlFor="return-dates" className="block mb-2 text-sm font-medium">
+          <div className="bg-[#F6F6F6] p-4 rounded-lg shadow-sm">
+            <Label htmlFor="return-dates" className="block mb-2 text-sm font-medium text-[#002B5C]">
               Dates retour (optionnel)
             </Label>
             <DateRangePicker 
@@ -194,20 +206,20 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
 
         <div className="grid gap-6 lg:grid-cols-2">
           <div>
-            <Label htmlFor="departure-zone" className="block mb-2 text-sm font-medium">
+            <Label htmlFor="departure-zone" className="block mb-2 text-sm font-medium text-[#002B5C]">
               Zone de départ
             </Label>
             <Select 
               value={departureZone} 
               onValueChange={value => {
                 setDepartureZone(value);
-                setDepartureStation('');
+                setSelectedDepartureStations([]);
               }}
             >
-              <SelectTrigger id="departure-zone" className="w-full">
+              <SelectTrigger id="departure-zone" className="w-full border-[#E0E7FF] focus:ring-[#00B2E3]">
                 <SelectValue placeholder="Aucune" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="border-[#E0E7FF]">
                 <SelectItem value="none">Aucune</SelectItem>
                 {zones.map(zone => (
                   <SelectItem key={zone.id} value={zone.id}>{zone.name}</SelectItem>
@@ -217,31 +229,37 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
           </div>
 
           <div>
-            <Label htmlFor="departure-station" className="block mb-2 text-sm font-medium">
+            <Label htmlFor="departure-station" className="block mb-2 text-sm font-medium text-[#002B5C]">
               Départ spécifique (optionnel)
             </Label>
-            <Select 
-              value={departureStation} 
-              onValueChange={setDepartureStation}
-              disabled={!departureZone}
-            >
-              <SelectTrigger id="departure-station" className="w-full">
-                <SelectValue placeholder="Sélectionnez une gare" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Toutes les gares</SelectItem>
-                {departureZone && stationsByZone[departureZone as keyof typeof stationsByZone]?.map(station => (
-                  <SelectItem key={station.id} value={station.id}>{station.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-gray-500 mt-1">Vous pouvez laisser vide la zone de départ si vous choisissez un départ spécifique.</p>
+            
+            <div className="max-h-36 overflow-y-auto rounded-lg border border-[#E0E7FF] bg-white p-2">
+              {departureZone && departureZone !== 'none' ? (
+                stationsByZone[departureZone as keyof typeof stationsByZone]?.map(station => (
+                  <div key={station.id} className="flex items-center space-x-2 p-2 hover:bg-[#F6F6F6] rounded">
+                    <Checkbox 
+                      id={`station-${station.id}`} 
+                      checked={selectedDepartureStations.includes(station.id)}
+                      onCheckedChange={() => toggleDepartureStation(station.id)}
+                    />
+                    <label 
+                      htmlFor={`station-${station.id}`}
+                      className="text-sm cursor-pointer flex-grow"
+                    >
+                      {station.name}
+                    </label>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 p-2">Sélectionnez d'abord une zone</p>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
           <div>
-            <Label htmlFor="arrival-zone" className="block mb-2 text-sm font-medium">
+            <Label htmlFor="arrival-zone" className="block mb-2 text-sm font-medium text-[#002B5C]">
               Zone d'arrivée
             </Label>
             <Select 
@@ -251,10 +269,10 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
                 setArrivalStation('');
               }}
             >
-              <SelectTrigger id="arrival-zone" className="w-full">
+              <SelectTrigger id="arrival-zone" className="w-full border-[#E0E7FF] focus:ring-[#00B2E3]">
                 <SelectValue placeholder="Aucune" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="border-[#E0E7FF]">
                 <SelectItem value="none">Aucune</SelectItem>
                 {zones.map(zone => (
                   <SelectItem key={zone.id} value={zone.id}>{zone.name}</SelectItem>
@@ -264,41 +282,40 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
           </div>
 
           <div>
-            <Label htmlFor="arrival-station" className="block mb-2 text-sm font-medium">
+            <Label htmlFor="arrival-station" className="block mb-2 text-sm font-medium text-[#002B5C]">
               Destination spécifique (optionnel)
             </Label>
             <Select 
               value={arrivalStation} 
               onValueChange={setArrivalStation}
-              disabled={!arrivalZone}
+              disabled={!arrivalZone || arrivalZone === 'none'}
             >
-              <SelectTrigger id="arrival-station" className="w-full">
+              <SelectTrigger id="arrival-station" className="w-full border-[#E0E7FF] focus:ring-[#00B2E3]">
                 <SelectValue placeholder="Sélectionnez une gare" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="border-[#E0E7FF]">
                 <SelectItem value="all">Toutes les gares</SelectItem>
-                {arrivalZone && stationsByZone[arrivalZone as keyof typeof stationsByZone]?.map(station => (
+                {arrivalZone && arrivalZone !== 'none' && stationsByZone[arrivalZone as keyof typeof stationsByZone]?.map(station => (
                   <SelectItem key={station.id} value={station.id}>{station.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-gray-500 mt-1">Vous pouvez laisser vide la zone d'arrivée si vous choisissez une destination spécifique.</p>
           </div>
         </div>
 
         <div className="flex gap-4 justify-center mt-8">
           <Button 
             type="submit" 
-            className="bg-[#00B2E3] hover:bg-[#0099cc] text-white w-32" 
+            className="bg-gradient-to-r from-[#00B2E3] to-[#0099cc] hover:from-[#0099cc] hover:to-[#0088bb] text-white w-32 shadow-md transition-all transform hover:scale-105" 
           >
-            Aller
+            Rechercher
           </Button>
           <Button 
             type="button" 
             variant="outline" 
-            className="border-[#002B5C] text-[#002B5C] hover:bg-[#F6F6F6] w-32" 
+            className="border-[#002B5C] text-[#002B5C] hover:bg-[#F6F6F6] w-32 shadow-sm transition-all transform hover:scale-105" 
           >
-            Retour
+            Annuler
           </Button>
         </div>
       </form>

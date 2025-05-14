@@ -117,7 +117,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   const [departureZone, setDepartureZone] = useState<string>('');
   const [selectedDepartureStations, setSelectedDepartureStations] = useState<string[]>([]);
   const [arrivalZone, setArrivalZone] = useState<string>('');
-  const [arrivalStation, setArrivalStation] = useState<string>('');
+  const [selectedArrivalStations, setSelectedArrivalStations] = useState<string[]>([]);
 
   const handleInvertCriteria = () => {
     // Swap departure and arrival zones
@@ -126,9 +126,9 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
     setArrivalZone(tempZone);
 
     // Swap departure and arrival stations
-    const tempStation = selectedDepartureStations.length > 0 ? selectedDepartureStations[0] : '';
-    setSelectedDepartureStations(arrivalStation ? [arrivalStation] : []);
-    setArrivalStation(tempStation);
+    const tempStations = [...selectedDepartureStations];
+    setSelectedDepartureStations(selectedArrivalStations);
+    setSelectedArrivalStations(tempStations);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -139,7 +139,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
       departureZone,
       departureStations: selectedDepartureStations,
       arrivalZone,
-      arrivalStation,
+      arrivalStations: selectedArrivalStations,
     });
   };
 
@@ -153,10 +153,20 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
     });
   };
 
+  const toggleArrivalStation = (stationId: string) => {
+    setSelectedArrivalStations(prev => {
+      if (prev.includes(stationId)) {
+        return prev.filter(id => id !== stationId);
+      } else {
+        return [...prev, stationId];
+      }
+    });
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 max-w-3xl mx-auto mb-8 border border-[#E0E7FF]">
       <div className="bg-gradient-to-r from-[#002B5C] to-[#00B2E3] -mx-6 -mt-6 px-6 py-4 rounded-t-xl mb-6 flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-white">Recherche de trajets TGV Max</h2>
+        <h2 className="text-xl font-semibold text-white">Recherche de trajets TGV Finder</h2>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -266,7 +276,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
               value={arrivalZone} 
               onValueChange={value => {
                 setArrivalZone(value);
-                setArrivalStation('');
+                setSelectedArrivalStations([]);
               }}
             >
               <SelectTrigger id="arrival-zone" className="w-full border-[#E0E7FF] focus:ring-[#00B2E3]">
@@ -285,21 +295,27 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             <Label htmlFor="arrival-station" className="block mb-2 text-sm font-medium text-[#002B5C]">
               Destination spécifique (optionnel)
             </Label>
-            <Select 
-              value={arrivalStation} 
-              onValueChange={setArrivalStation}
-              disabled={!arrivalZone || arrivalZone === 'none'}
-            >
-              <SelectTrigger id="arrival-station" className="w-full border-[#E0E7FF] focus:ring-[#00B2E3]">
-                <SelectValue placeholder="Sélectionnez une gare" />
-              </SelectTrigger>
-              <SelectContent className="border-[#E0E7FF]">
-                <SelectItem value="all">Toutes les gares</SelectItem>
-                {arrivalZone && arrivalZone !== 'none' && stationsByZone[arrivalZone as keyof typeof stationsByZone]?.map(station => (
-                  <SelectItem key={station.id} value={station.id}>{station.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="max-h-36 overflow-y-auto rounded-lg border border-[#E0E7FF] bg-white p-2">
+              {arrivalZone && arrivalZone !== 'none' ? (
+                stationsByZone[arrivalZone as keyof typeof stationsByZone]?.map(station => (
+                  <div key={station.id} className="flex items-center space-x-2 p-2 hover:bg-[#F6F6F6] rounded">
+                    <Checkbox 
+                      id={`arrival-station-${station.id}`} 
+                      checked={selectedArrivalStations.includes(station.id)}
+                      onCheckedChange={() => toggleArrivalStation(station.id)}
+                    />
+                    <label 
+                      htmlFor={`arrival-station-${station.id}`}
+                      className="text-sm cursor-pointer flex-grow"
+                    >
+                      {station.name}
+                    </label>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 p-2">Sélectionnez d'abord une zone</p>
+              )}
+            </div>
           </div>
         </div>
 

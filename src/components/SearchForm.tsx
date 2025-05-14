@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -144,7 +145,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
                 <SelectValue placeholder="Aucune" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Aucune</SelectItem>
+                <SelectItem value="none">Aucune</SelectItem>
                 {zones.map(zone => (
                   <SelectItem key={zone.id} value={zone.id}>{zone.name}</SelectItem>
                 ))}
@@ -165,7 +166,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
                 <SelectValue placeholder="Sélectionnez une gare" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes les gares</SelectItem>
+                <SelectItem value="all">Toutes les gares</SelectItem>
                 {departureZone && stationsByZone[departureZone as keyof typeof stationsByZone]?.map(station => (
                   <SelectItem key={station.id} value={station.id}>{station.name}</SelectItem>
                 ))}
@@ -191,7 +192,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
                 <SelectValue placeholder="Aucune" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Aucune</SelectItem>
+                <SelectItem value="none">Aucune</SelectItem>
                 {zones.map(zone => (
                   <SelectItem key={zone.id} value={zone.id}>{zone.name}</SelectItem>
                 ))}
@@ -212,7 +213,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
                 <SelectValue placeholder="Sélectionnez une gare" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes les gares</SelectItem>
+                <SelectItem value="all">Toutes les gares</SelectItem>
                 {arrivalZone && stationsByZone[arrivalZone as keyof typeof stationsByZone]?.map(station => (
                   <SelectItem key={station.id} value={station.id}>{station.name}</SelectItem>
                 ))}

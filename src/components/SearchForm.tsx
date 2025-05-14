@@ -8,36 +8,100 @@ import { ArrowRightLeft } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DateRange } from 'react-day-picker'; // Import DateRange from react-day-picker
 
-// Mock data for zones and stations
+// Updated zones data from user provided information
 const zones = [
   { id: 'paris', name: 'Paris' },
   { id: 'lyon', name: 'Lyon' },
-  { id: 'marseille', name: 'Marseille' },
-  { id: 'lille', name: 'Lille' },
+  { id: 'marseille_provence', name: 'Marseille Provence' },
+  { id: 'lille_metropole', name: 'Lille Métropole' },
   { id: 'bordeaux', name: 'Bordeaux' },
+  { id: 'toulouse', name: 'Toulouse' },
+  { id: 'nice_cote_dazur', name: 'Nice Côte d\'Azur' },
+  { id: 'strasbourg', name: 'Strasbourg' },
+  { id: 'rennes', name: 'Rennes' },
+  { id: 'montpellier', name: 'Montpellier' },
+  { id: 'avignon', name: 'Avignon' },
+  { id: 'valence', name: 'Valence' },
+  { id: 'besancon', name: 'Besançon' },
+  { id: 'macon', name: 'Mâcon' },
 ];
 
-// Mock stations per zone
+// Updated stations per zone based on provided data
 const stationsByZone = {
   paris: [
-    { id: 'paris-gare-de-lyon', name: 'Paris Gare de Lyon' },
-    { id: 'paris-montparnasse', name: 'Paris Montparnasse' },
-    { id: 'paris-nord', name: 'Paris Nord' },
-    { id: 'paris-est', name: 'Paris Est' },
+    { id: 'paris-intramuros', name: 'PARIS (intramuros)' },
+    { id: 'paris-montparnasse', name: 'PARIS MONTPARNASSE VAUGIRARD' },
+    { id: 'roissy-cdg', name: 'AEROPORT ROISSY CDG 2 TGV' },
+    { id: 'marne-la-vallee', name: 'MARNE LA VALLEE CHESSY' },
+    { id: 'massy-palaiseau', name: 'MASSY PALAISEAU' },
+    { id: 'massy-tgv', name: 'MASSY TGV' },
+    { id: 'versailles-chantiers', name: 'VERSAILLES CHANTIERS' },
+    { id: 'mantes-la-jolie', name: 'MANTES LA JOLIE' },
   ],
   lyon: [
-    { id: 'lyon-part-dieu', name: 'Lyon Part-Dieu' },
-    { id: 'lyon-perrache', name: 'Lyon Perrache' },
+    { id: 'lyon-intramuros', name: 'LYON (intramuros)' },
+    { id: 'lyon-st-exupery', name: 'LYON ST EXUPERY TGV.' },
   ],
-  marseille: [
-    { id: 'marseille-saint-charles', name: 'Marseille Saint-Charles' },
+  marseille_provence: [
+    { id: 'marseille-st-charles', name: 'MARSEILLE ST CHARLES' },
+    { id: 'marseille-blancarde', name: 'MARSEILLE BLANCARDE' },
+    { id: 'aix-en-provence-tgv', name: 'AIX EN PROVENCE TGV' },
+    { id: 'miramas', name: 'MIRAMAS' },
   ],
-  lille: [
-    { id: 'lille-europe', name: 'Lille Europe' },
-    { id: 'lille-flandres', name: 'Lille Flandres' },
+  lille_metropole: [
+    { id: 'lille-intramuros', name: 'LILLE (intramuros)' },
+    { id: 'tourcoing', name: 'TOURCOING' },
+    { id: 'roubaix', name: 'ROUBAIX' },
+    { id: 'croix-wasquehal', name: 'CROIX WASQUEHAL' },
+    { id: 'douai', name: 'DOUAI' },
+    { id: 'hazebrouck', name: 'HAZEBROUCK' },
+    { id: 'lens', name: 'LENS' },
+    { id: 'arras', name: 'ARRAS' },
+    { id: 'valenciennes', name: 'VALENCIENNES' },
   ],
   bordeaux: [
-    { id: 'bordeaux-saint-jean', name: 'Bordeaux Saint-Jean' },
+    { id: 'bordeaux-st-jean', name: 'BORDEAUX ST JEAN' },
+    { id: 'libourne', name: 'LIBOURNE' },
+    { id: 'biganos-facture', name: 'BIGANOS FACTURE' },
+    { id: 'la-teste', name: 'LA TESTE' },
+    { id: 'arcachon', name: 'ARCACHON' },
+  ],
+  toulouse: [
+    { id: 'toulouse-matabiau', name: 'TOULOUSE MATABIAU' },
+    { id: 'montauban-ville-bourbon', name: 'MONTAUBAN VILLE BOURBON' },
+  ],
+  nice_cote_dazur: [
+    { id: 'nice-ville', name: 'NICE VILLE' },
+    { id: 'antibes', name: 'ANTIBES' },
+    { id: 'cannes', name: 'CANNES' },
+  ],
+  strasbourg: [
+    { id: 'strasbourg', name: 'STRASBOURG' },
+    { id: 'selestat', name: 'SELESTAT' },
+  ],
+  rennes: [
+    { id: 'rennes', name: 'RENNES' },
+    { id: 'vitre', name: 'VITRE' },
+  ],
+  montpellier: [
+    { id: 'montpellier-saint-roch', name: 'MONTPELLIER SAINT ROCH' },
+    { id: 'montpellier-sud-de-france', name: 'MONTPELLIER SUD DE FRANCE' },
+  ],
+  avignon: [
+    { id: 'avignon-centre', name: 'AVIGNON CENTRE' },
+    { id: 'avignon-tgv', name: 'AVIGNON TGV' },
+  ],
+  valence: [
+    { id: 'valence-ville', name: 'VALENCE VILLE' },
+    { id: 'valence-tgv', name: 'VALENCE TGV' },
+  ],
+  besancon: [
+    { id: 'besancon-viotte', name: 'BESANCON VIOTTE' },
+    { id: 'besancon-franche-comte-tgv', name: 'BESANCON FRANCHE COMTE TGV' },
+  ],
+  macon: [
+    { id: 'macon-ville', name: 'MACON VILLE' },
+    { id: 'macon-loche-tgv', name: 'MACON LOCHE TGV' },
   ],
 };
 
@@ -45,8 +109,7 @@ interface SearchFormProps {
   onSearch: (criteria: any) => void;
 }
 
-// Removed the custom DateRange interface as we're using the one from react-day-picker
-
+// Using the DateRange from react-day-picker
 const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
   const [departureRange, setDepartureRange] = useState<DateRange>({ from: undefined, to: undefined });
   const [returnRange, setReturnRange] = useState<DateRange>({ from: undefined, to: undefined });
